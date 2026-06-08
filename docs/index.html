@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Automation Stack — IT Solutions USA</title>
+<meta name="description" content="Network automation stack for Cisco CSR1000v fleet management — Flask API gateway, socat transport bridge, Cloudflare Zero Trust, and Phase 2 roadmap with Netmiko, NAPALM, Nornir, NetworkX, and Scapy.">
+<meta name="author" content="Ioannis Alexander Konstas">
+<meta name="robots" content="index, follow">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #e6edf3; line-height: 1.7; }
+  .header { background: linear-gradient(135deg, #0d1117 0%, #1a2332 100%); padding: 70px 40px 50px; border-bottom: 1px solid #21262d; text-align: center; }
+  .header h1 { font-size: 2em; color: #58a6ff; margin-bottom: 10px; }
+  .header p { color: #8b949e; font-size: 0.95em; }
+  .badge { display: inline-block; background: #198754; color: white; font-size: 0.75em; padding: 3px 10px; border-radius: 10px; margin-left: 10px; vertical-align: middle; }
+  .container { max-width: 860px; margin: 0 auto; padding: 50px 40px; }
+  h2 { font-size: 1.1em; color: #58a6ff; border-left: 4px solid #58a6ff; padding-left: 14px; margin: 40px 0 20px; }
+  .card { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+  .card h3 { font-size: 1.05em; margin-bottom: 8px; }
+  .card h3 a { color: #58a6ff; text-decoration: none; }
+  .card h3 a:hover { text-decoration: underline; }
+  .card p { color: #8b949e; font-size: 0.9em; margin-bottom: 10px; }
+  .tag { display: inline-block; background: #21262d; color: #8b949e; font-size: 0.78em; padding: 2px 10px; border-radius: 12px; margin: 4px 4px 0 0; }
+  .diagram-preview { background: #0d1117; border: 1px solid #21262d; border-radius: 6px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.72em; color: #8b949e; line-height: 1.5; margin-top: 12px; overflow: hidden; max-height: 120px; white-space: pre; }
+  footer { text-align: center; padding: 40px; color: #484f58; font-size: 0.85em; border-top: 1px solid #21262d; margin-top: 60px; }
+  footer a { color: #58a6ff; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Network Automation Stack <span class="badge">Functional</span></h1>
+  <p>Programmatic HTTP-to-Telnet Gateway for Network Device Fleets &nbsp;·&nbsp; IT Solutions USA<br>
+  Ioannis Alexander Konstas &nbsp;·&nbsp; February 2026</p>
+</div>
+
+<div class="container">
+
+  <h2>Architecture &amp; Diagrams</h2>
+
+  <div class="card">
+    <h3><a href="topology.html">Current Architecture — Stack Topology</a></h3>
+    <p>Full architecture diagram of the Flask API gateway over socat transport bridge — Cloudflare Zero Trust edge, Tailscale WireGuard out-of-band access, security posture, data flow, and quick start.</p>
+    <span class="tag">Flask</span><span class="tag">socat</span><span class="tag">Cloudflare</span><span class="tag">WireGuard</span><span class="tag">Cisco CSR1000v</span>
+    <div class="diagram-preview">  curl / Replit / AI Agent / Automation Script
+                        |
+               HTTPS (outbound-only)
+                        |
+            +-----------+-----------+
+            |    Cloudflare Edge    |  WAF + Zero Trust
+            +-----------+-----------+
+                        |
+                        v
+  +-----------------------------------------------------+
+  |  MAC MINI  (Management Host)                        |
+  |     Flask API :8080  ←→  socat Gateway :2301-2310   |
+  +-----------------------------------------------------+
+                        |
+  +-----------------------------------------------------+
+  |  R1(2301)  R2(2302)  R3(2303) ... R10(2310)         |
+  |  Cisco CSR1000v Fleet                               |
+  +-----------------------------------------------------+</div>
+  </div>
+
+  <div class="card">
+    <h3><a href="roadmap.html">Phase 2 — Platform Roadmap</a></h3>
+    <p>Target architecture and implementation plan for evolving into a full self-hosted automation platform — Netmiko, Nornir, NAPALM, NetworkX, Scapy, and Nginx SSL replacing the Cloudflare Tunnel.</p>
+    <span class="tag">Netmiko</span><span class="tag">NAPALM</span><span class="tag">Nornir</span><span class="tag">NetworkX</span><span class="tag">Scapy</span><span class="tag">Nginx</span>
+    <div class="diagram-preview">  [ Browser / Engineer / AI Agent ]
+                  |  HTTPS (local, self-signed)
+       +----------v-----------+
+       |   Nginx  (SSL)       |  ← replaces Cloudflare Tunnel
+       +----------+-----------+
+                  |
+       +----------v-----------+
+       |   Flask API          |
+       |   Netmiko · NAPALM   |
+       |   Nornir · NetworkX  |
+       |   Scapy              |
+       +----------+-----------+
+                  |
+       |   CSR1000v Fleet     |</div>
+  </div>
+
+  <h2>Source Code</h2>
+
+  <div class="card">
+    <h3><a href="https://github.com/IT-Solutions-USA/network-automation-stack">github.com/IT-Solutions-USA/network-automation-stack</a></h3>
+    <p>Flask API source, socat gateway script, Replit topology check, technical report, and Phase 2 roadmap.</p>
+    <span class="tag">Python</span><span class="tag">Flask</span><span class="tag">Bash</span><span class="tag">MIT License</span>
+  </div>
+
+  <div class="card">
+    <h3><a href="https://github.com/ikonstas70/network-automation-stack">github.com/ikonstas70/network-automation-stack</a></h3>
+    <p>Personal mirror of the same project on the ikonstas70 account.</p>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Ioannis Alexander Konstas — IT Solutions USA &nbsp;·&nbsp;
+  <a href="https://ikonstas70.github.io">ikonstas70.github.io</a>
+</footer>
+
+</body>
+</html>

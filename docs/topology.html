@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Automation Stack — Architecture & Topology — Ioannis Alexander Konstas</title>
+<meta name="description" content="Network automation stack architecture — Flask API gateway over socat transport bridge for Cisco CSR1000v fleet management with Cloudflare Zero Trust and Tailscale WireGuard.">
+<meta name="author" content="Ioannis Alexander Konstas">
+<meta name="robots" content="index, follow">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; color: #212529; line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, #0d1117 0%, #1a2332 100%); color: white; padding: 70px 60px 50px; }
+  .cover h1 { font-size: 1.9em; font-weight: 700; color: #58a6ff; margin-bottom: 8px; line-height: 1.3; }
+  .cover h2 { font-size: 1em; font-weight: 400; color: #8b949e; margin-bottom: 30px; }
+  .cover .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.88em; color: #c9d1d9; }
+  .cover .meta span { color: #58a6ff; font-weight: 600; }
+  .cover .back { margin-bottom: 20px; }
+  .cover .back a { color: #58a6ff; text-decoration: none; font-size: 0.85em; }
+  .container { max-width: 960px; margin: 0 auto; padding: 50px; }
+  h2 { font-size: 1.3em; color: #0d6efd; border-left: 4px solid #0d6efd; padding-left: 14px; margin: 40px 0 16px; }
+  h3 { font-size: 1.05em; color: #495057; margin: 28px 0 10px; border-bottom: 1px solid #dee2e6; padding-bottom: 6px; }
+  p { margin-bottom: 14px; color: #343a40; }
+  .diagram { background: #0d1117; color: #e6edf3; padding: 30px; border-radius: 10px; font-family: 'Courier New', monospace; font-size: 0.82em; line-height: 1.6; margin: 20px 0; overflow-x: auto; white-space: pre; }
+  code { background: #e9ecef; color: #d63384; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.88em; }
+  pre { background: #0d1117; color: #e6edf3; padding: 20px 24px; border-radius: 8px; font-size: 0.85em; margin: 16px 0; overflow-x: auto; font-family: 'Courier New', monospace; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+  th { background: #0d1117; color: #58a6ff; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #dee2e6; }
+  tr:nth-child(even) td { background: #f8f9fa; }
+  td code { background: #e9ecef; color: #d63384; }
+  blockquote { background: #fff3cd; border-left: 4px solid #ffc107; padding: 14px 18px; margin: 16px 0; border-radius: 0 6px 6px 0; font-size: 0.92em; color: #856404; }
+  .status-badge { display: inline-block; background: #198754; color: white; font-size: 0.78em; padding: 3px 10px; border-radius: 12px; margin-left: 10px; vertical-align: middle; }
+  .layer { background: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px 20px; margin-bottom: 10px; display: flex; align-items: center; gap: 16px; }
+  .layer-icon { background: #0d1117; color: #58a6ff; width: 40px; height: 40px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: 700; flex-shrink: 0; text-align: center; }
+  .layer-info { flex: 1; }
+  .layer-info strong { color: #212529; display: block; margin-bottom: 2px; }
+  .layer-info span { color: #6c757d; font-size: 0.85em; }
+  .flow-step { display: flex; gap: 16px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #dee2e6; }
+  .flow-num { background: #0d6efd; color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.82em; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .flow-text { color: #343a40; font-size: 0.92em; }
+  .footer { background: #0d1117; color: #8b949e; text-align: center; padding: 30px; font-size: 0.85em; margin-top: 60px; }
+  .footer a { color: #58a6ff; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="back"><a href="https://ikonstas70.github.io">← ikonstas70.github.io</a></div>
+  <h1>Network Automation Stack <span class="status-badge">Functional</span></h1>
+  <h2>Programmatic HTTP-to-Telnet Gateway for Network Device Fleets</h2>
+  <div class="meta">
+    <div><span>Author:</span> Ioannis Alexander Konstas</div>
+    <div><span>Organization:</span> IT Solutions USA</div>
+    <div><span>Date:</span> February 17, 2026</div>
+    <div><span>Repository:</span> github.com/ikonstas70/network-automation-stack</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <h2>Overview</h2>
+  <p>This project establishes a high-security, automated management layer for network device fleets. By layering a Flask API Gateway over a socat transport bridge, it converts any Telnet-accessible device into a RESTful endpoint — transforming 10–20 Cisco CSR1000v routers into a programmatically managed fleet with zero external exposure.</p>
+  <p><strong>Platform-agnostic:</strong> No hypervisor required. The stack works with any appliance reachable via Telnet on a forwarded port — physical hardware, virtual machines, console servers, or any platform that maps devices to TCP ports.</p>
+
+  <h2>Architecture Diagram</h2>
+  <div class="diagram">  curl / Replit / AI Agent / Automation Script
+                        |
+               HTTPS (outbound-only)
+                        |
+            +-----------+-----------+
+            |    Cloudflare Edge    |  WAF + Zero Trust
+            +-----------+-----------+
+                        |
+                Cloudflare Tunnel
+                        |
+                        v
+  +-----------------------------------------------------+
+  |  MAC MINI  (Management Host)                        |
+  |                                                     |
+  |     +---------------+----------------+              |
+  |     |  Flask API  :8080              |              |
+  |     |  csr_api_secure.py             |              |
+  |     |   - X-API-KEY validation       |              |
+  |     |   - ALLOWED_PORTS check        |              |
+  |     |   - Timing controller          |              |
+  |     |   - scrub_output() regex       |              |
+  |     +---------------+----------------+              |
+  |                     |  localhost                    |
+  |     +---------------+----------------+              |
+  |     |  socat Gateway  (telnet.sh)    |              |
+  |     |  Ports 2301-2310               |              |
+  |     |   - fork  (concurrent)         |              |
+  |     |   - nohup (persistent)         |              |
+  |     +---------------+----------------+              |
+  |                     |  L3 Point-to-Point            |
+  +---------------------+-------------------------------+
+                        |  (No default gateway)
+                        v
+  +-----------------------------------------------------+
+  |  NETWORK DEVICE LAYER                               |
+  |  (any Telnet-accessible appliance)                  |
+  |                                                     |
+  |  +------+ +------+ +------+ +------+   +------+    |
+  |  |  R1  | |  R2  | |  R3  | |  R4  |...| R10  |   |
+  |  | 2301 | | 2302 | | 2303 | | 2304 |   | 2310 |   |
+  |  +------+ +------+ +------+ +------+   +------+    |
+  |         Cisco CSR1000v Fleet (current)              |
+  +-----------------------------------------------------+
+
+  OUT-OF-BAND ACCESS (Tailscale WireGuard):
+  [ Engineer ] ----------------------------------------> [ Mac Mini :2301-2310 ]</div>
+
+  <h2>Stack Layers</h2>
+
+  <div class="layer">
+    <div class="layer-icon">EDGE</div>
+    <div class="layer-info">
+      <strong>Cloudflare Tunnel + WAF</strong>
+      <span>Global HTTPS access, Web Application Firewall, Zero Trust policy enforcement. No inbound ports open on the host.</span>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-icon">API</div>
+    <div class="layer-info">
+      <strong>Flask API — csr_api_secure.py (:8080)</strong>
+      <span>X-API-KEY authentication, ALLOWED_PORTS validation, timing controller, scrub_output() regex sanitization.</span>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-icon">TCP</div>
+    <div class="layer-info">
+      <strong>socat Gateway — telnet.sh (Ports 2301–2310)</strong>
+      <span>TCP relay from management host to target device. Fork mode for concurrent sessions. nohup for persistence.</span>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-icon">DEV</div>
+    <div class="layer-info">
+      <strong>Network Device Layer</strong>
+      <span>Any Telnet-accessible appliance. Current deployment: Cisco CSR1000v fleet on isolated L3 point-to-point (no default gateway).</span>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="layer-icon">VPN</div>
+    <div class="layer-info">
+      <strong>Tailscale / WireGuard — Out-of-Band Access</strong>
+      <span>Private mesh VPN for direct engineer access to console ports, independent of the Cloudflare path.</span>
+    </div>
+  </div>
+
+  <h2>Data Flow</h2>
+
+  <div>
+    <div class="flow-step"><div class="flow-num">1</div><div class="flow-text"><strong>Trigger</strong> — <code>curl POST /telnet {"port": 2301, "command": "show ip int brief"}</code></div></div>
+    <div class="flow-step"><div class="flow-num">2</div><div class="flow-text"><strong>Ingress</strong> — Cloudflare Tunnel forwards request to localhost:8080</div></div>
+    <div class="flow-step"><div class="flow-num">3</div><div class="flow-text"><strong>Validate</strong> — Flask checks X-API-KEY header and ALLOWED_PORTS list</div></div>
+    <div class="flow-step"><div class="flow-num">4</div><div class="flow-text"><strong>Execute</strong> — Python subshell with timed printf/telnet sequence</div></div>
+    <div class="flow-step"><div class="flow-num">5</div><div class="flow-text"><strong>Relay</strong> — socat forwards localhost:2301 → target-host:2301</div></div>
+    <div class="flow-step"><div class="flow-num">6</div><div class="flow-text"><strong>Execution</strong> — Device receives command via Telnet on the forwarded port</div></div>
+    <div class="flow-step" style="border-bottom:none;"><div class="flow-num">7</div><div class="flow-text"><strong>Return</strong> — Output scrubbed and returned as structured JSON</div></div>
+  </div>
+
+  <h2>Security Posture</h2>
+  <table>
+    <tr><th>Feature</th><th>Mechanism</th><th>Purpose</th></tr>
+    <tr><td>Authentication</td><td><code>X-API-KEY</code> header</td><td>Blocks unauthenticated API access</td></tr>
+    <tr><td>Port restriction</td><td><code>ALLOWED_PORTS</code> list</td><td>Limits access to ports 2301–2310 only</td></tr>
+    <tr><td>Network isolation</td><td>L3 Point-to-Point, no default gateway</td><td>Devices unreachable from internet</td></tr>
+    <tr><td>Output sanitization</td><td><code>scrub_output()</code> regex</td><td>Strips Telnet banners and escape chars</td></tr>
+    <tr><td>Transport encryption</td><td>Tailscale WireGuard</td><td>Private mesh VPN for engineer access</td></tr>
+    <tr><td>Application firewall</td><td>Cloudflare WAF</td><td>Filters malicious inbound requests</td></tr>
+  </table>
+  <blockquote><strong>Defense-in-depth:</strong> Two independent access paths — Cloudflare (public API) and Tailscale (private console) — operate at different stack layers and do not share configuration.</blockquote>
+
+  <h2>Quick Start</h2>
+<pre># Install dependencies
+python3 -m venv ~/csr_env && source ~/csr_env/bin/activate
+pip install -r requirements.txt
+
+# Start socat transport bridge
+sh src/telnet.sh
+
+# Start Flask API
+sh src/start_csr_api.sh
+
+# Open Cloudflare tunnel
+cloudflared tunnel --url http://localhost:8080
+
+# Send a command
+curl -X POST http://127.0.0.1:8080/telnet \
+     -H "X-API-KEY: YOUR_SECRET_KEY_HERE" \
+     -H "Content-Type: application/json" \
+     -d '{"port": 2301, "command": "show ip interface brief"}'</pre>
+
+  <h2>Future Roadmap</h2>
+  <ul style="margin:10px 0 0 24px;color:#343a40;">
+    <li>Command sanitization to replace <code>shell=True</code> subprocess execution</li>
+    <li>SSH transport layer replacing Telnet over socat</li>
+    <li>Self-hosted LLM integration for AI-driven network operations</li>
+    <li>NAPALM / Ansible orchestration layer over the Flask API</li>
+    <li>Persistent Cloudflare named tunnel replacing quick tunnels</li>
+  </ul>
+
+</div>
+
+<div class="footer">
+  © 2026 Ioannis Alexander Konstas — IT Solutions USA &nbsp;·&nbsp;
+  <a href="https://ikonstas70.github.io">ikonstas70.github.io</a> &nbsp;·&nbsp;
+  <a href="https://github.com/ikonstas70/network-automation-stack">GitHub Repository</a>
+</div>
+
+</body>
+</html>

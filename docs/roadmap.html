@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Automation Platform — Phase 2 Roadmap — Ioannis Alexander Konstas</title>
+<meta name="description" content="Phase 2 roadmap for the network automation stack — Netmiko, NAPALM, Nornir, NetworkX, Scapy, and Nginx SSL replacing Cloudflare Tunnel for a fully self-hosted platform.">
+<meta name="author" content="Ioannis Alexander Konstas">
+<meta name="robots" content="index, follow">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; color: #212529; line-height: 1.7; }
+  .cover { background: linear-gradient(135deg, #0d1117 0%, #1a2332 100%); color: white; padding: 70px 60px 50px; }
+  .cover h1 { font-size: 1.9em; font-weight: 700; color: #58a6ff; margin-bottom: 8px; line-height: 1.3; }
+  .cover h2 { font-size: 1em; font-weight: 400; color: #8b949e; margin-bottom: 30px; }
+  .cover .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.88em; color: #c9d1d9; }
+  .cover .meta span { color: #58a6ff; font-weight: 600; }
+  .cover .back { margin-bottom: 20px; }
+  .cover .back a { color: #58a6ff; text-decoration: none; font-size: 0.85em; }
+  .container { max-width: 960px; margin: 0 auto; padding: 50px; }
+  h2 { font-size: 1.3em; color: #0d6efd; border-left: 4px solid #0d6efd; padding-left: 14px; margin: 40px 0 16px; }
+  h3 { font-size: 1.05em; color: #495057; margin: 28px 0 10px; border-bottom: 1px solid #dee2e6; padding-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  p { margin-bottom: 14px; color: #343a40; }
+  .diagram { background: #0d1117; color: #e6edf3; padding: 30px; border-radius: 10px; font-family: 'Courier New', monospace; font-size: 0.8em; line-height: 1.6; margin: 20px 0; overflow-x: auto; white-space: pre; }
+  code { background: #e9ecef; color: #d63384; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 0.88em; }
+  pre { background: #0d1117; color: #e6edf3; padding: 20px 24px; border-radius: 8px; font-size: 0.85em; margin: 16px 0; overflow-x: auto; font-family: 'Courier New', monospace; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9em; }
+  th { background: #0d1117; color: #58a6ff; padding: 10px 14px; text-align: left; }
+  td { padding: 9px 14px; border-bottom: 1px solid #dee2e6; }
+  td code { background: #e9ecef; color: #d63384; }
+  tr:nth-child(even) td { background: #f8f9fa; }
+  .priority-high { display: inline-block; background: #dc3545; color: white; font-size: 0.72em; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .priority-med { display: inline-block; background: #fd7e14; color: white; font-size: 0.72em; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .priority-low { display: inline-block; background: #6c757d; color: white; font-size: 0.72em; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  blockquote { background: #e8f0fe; border-left: 4px solid #0d6efd; padding: 14px 18px; margin: 16px 0; border-radius: 0 6px 6px 0; font-size: 0.92em; color: #0d47a1; }
+  ul { margin: 10px 0 14px 24px; color: #343a40; }
+  li { margin-bottom: 6px; }
+  .footer { background: #0d1117; color: #8b949e; text-align: center; padding: 30px; font-size: 0.85em; margin-top: 60px; }
+  .footer a { color: #58a6ff; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="back"><a href="https://ikonstas70.github.io">← ikonstas70.github.io</a></div>
+  <h1>Network Automation Platform — Phase 2 Roadmap</h1>
+  <h2>Netmiko · NAPALM · Nornir · NetworkX · Scapy · Nginx SSL</h2>
+  <div class="meta">
+    <div><span>Author:</span> Ioannis Alexander Konstas</div>
+    <div><span>Organization:</span> IT Solutions USA</div>
+    <div><span>Project:</span> Network Automation Stack</div>
+    <div><span>Repository:</span> github.com/ikonstas70/network-automation-stack</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <h2>Vision</h2>
+  <p>The current stack solves the "last mile" problem — serial console access via a REST API. Phase 2 transforms it into a professional-grade automation platform: structured device interaction, parallel fleet operations, live topology graphing, and packet-level diagnostics, all served over local HTTPS with no external cloud dependencies.</p>
+
+  <h2>Target Architecture</h2>
+  <div class="diagram">  [ Browser / Engineer / AI Agent ]
+                  |
+                  | HTTPS  (local, self-signed)
+                  |
+       +----------v-----------+
+       |   Nginx  (SSL)       |  ← replaces Cloudflare Tunnel
+       +----------+-----------+
+                  |
+       +----------v-----------+
+       |   Flask API          |
+       |                      |
+       |   Netmiko  ──────────┼──► SSH / Telnet session management
+       |   NAPALM   ──────────┼──► Structured multi-vendor data
+       |   Nornir   ──────────┼──► Parallel fleet execution
+       |   NetworkX ──────────┼──► Live topology graph
+       |   Scapy    ──────────┼──► Packet crafting & analysis
+       +----------+-----------+
+                  |
+       +----------v-----------+
+       |   CSR1000v Fleet     |
+       |   Ports 2301–2310    |
+       +----------------------+</div>
+
+  <h2>Tool Integration Map</h2>
+  <div class="diagram">                        NETWORK AUTOMATION PLATFORM
+  +------------------------------------------------------------------+
+  |                                                                  |
+  |   INPUT LAYER                                                    |
+  |   +--------------------+   +--------------------+               |
+  |   |  REST API  (Flask) |   |  CLI / Scripts     |               |
+  |   +--------------------+   +--------------------+               |
+  |              |                        |                          |
+  |              +------------+-----------+                          |
+  |                           |                                      |
+  |   EXECUTION LAYER         |                                      |
+  |   +-----------------------+-----------------------------+        |
+  |   |                                                     |        |
+  |   |  +------------+   +------------+   +------------+  |        |
+  |   |  |  Netmiko   |   |   Nornir   |   |   NAPALM   |  |        |
+  |   |  | Session Mgr|   |  Parallel  |   | Structured |  |        |
+  |   |  | Prompt Det.|   |  Execution |   |    Data    |  |        |
+  |   |  +-----+------+   +-----+------+   +-----+------+  |        |
+  |   |        |                |                 |          |        |
+  |   +--------+-----------------+-----------------+---------+        |
+  |            |                                   |                  |
+  |   ANALYSIS LAYER                               |                  |
+  |   +----------------------------+   +-----------+------+          |
+  |   |       NetworkX             |   |      Scapy       |          |
+  |   |  Topology  | Path Analysis |   | Packet | Traffic |          |
+  |   |  Graphing  | Centrality    |   | Craft  | Capture |          |
+  |   +----------------------------+   +------------------+          |
+  |                                                                  |
+  |   TRANSPORT LAYER                                                |
+  |   +--------------------------------------------------------------+|
+  |   |              socat  (TCP relay)                              ||
+  |   |   Port 2301  Port 2302  Port 2303  ...  Port 2310           ||
+  |   +--------------------------------------------------------------+|
+  |                                                                  |
+  |   DEVICE LAYER                                                   |
+  |   +--------------------------------------------------------------+|
+  |   |   R1      R2      R3      R4      R5   ...   R10            ||
+  |   |   Cisco CSR1000v Fleet  (any Telnet-accessible appliance)   ||
+  |   +--------------------------------------------------------------+|
+  |                                                                  |
+  +------------------------------------------------------------------+</div>
+
+  <h2>Data Flow by Operation Type</h2>
+  <div class="diagram">  COMMAND EXECUTION          TOPOLOGY QUERY            PACKET TEST
+  ─────────────────          ──────────────            ───────────
+  Client                     Client                    Client
+    │                          │                         │
+    │ POST /command             │ GET /topology            │ POST /probe
+    ▼                          ▼                         ▼
+  Flask                      Flask                     Flask
+    │                          │                         │
+    │ Netmiko                   │ NAPALM                   │ Scapy
+    │ (prompt detect)           │ (get_interfaces)         │ (sr1)
+    ▼                          ▼                         ▼
+  Router                     Router                    Router
+    │                          │                         │
+    │ IOS output                │ Structured dict          │ ICMP reply
+    ▼                          ▼                         ▼
+  scrub + JSON               NetworkX                  RTT + TTL
+  response                   graph update              response</div>
+
+  <h2>Tool Reference</h2>
+
+  <h3>Netmiko — Session Management <span class="priority-high">Priority: High</span></h3>
+  <p>Replaces the current <code>shell=True</code> subshell with a structured connection handler. Handles prompt detection, output parsing, and timing natively — eliminating fixed sleep delays and the shell injection risk in the current implementation.</p>
+<pre>from netmiko import ConnectHandler
+
+device = {
+    "device_type": "cisco_ios_telnet",
+    "host": "127.0.0.1",
+    "port": 2301,
+}
+
+with ConnectHandler(**device) as conn:
+    output = conn.send_command("show ip interface brief")
+    print(output)</pre>
+
+  <h3>Nornir — Parallel Fleet Execution <span class="priority-high">Priority: High</span></h3>
+  <p>Runs tasks across all 10 routers simultaneously. A fleet-wide poll that currently takes 40+ seconds sequentially completes in under 5 seconds with Nornir.</p>
+<pre>from nornir import InitNornir
+from nornir_netmiko.tasks import netmiko_send_command
+from nornir_utils.plugins.functions import print_result
+
+nr = InitNornir(config_file="config.yaml")
+result = nr.run(
+    task=netmiko_send_command,
+    command_string="show ip interface brief"
+)
+print_result(result)</pre>
+
+  <h3>NAPALM — Multi-Vendor Abstraction <span class="priority-med">Priority: Medium</span></h3>
+  <p>Provides a unified API for retrieving structured data from network devices — Python dicts instead of raw CLI text. Works on top of Netmiko for Cisco IOS.</p>
+<pre>from napalm import get_network_driver
+
+driver = get_network_driver("ios")
+device = driver("127.0.0.1", "admin", "password",
+                optional_args={"port": 2301})
+device.open()
+
+facts      = device.get_facts()
+interfaces = device.get_interfaces()
+bgp        = device.get_bgp_neighbors()
+
+device.close()</pre>
+
+  <h3>NetworkX — Topology Graph <span class="priority-med">Priority: Medium</span></h3>
+  <p>Builds a live, queryable graph of the router fleet. Detects topology changes, calculates shortest paths, and provides the data layer for visualisation and AI-driven network analysis.</p>
+<pre>import networkx as nx
+
+G = nx.Graph()
+G.add_nodes_from(["R1", "R2", "R3", "R4", "Hub"])
+G.add_edges_from([
+    ("Hub", "R1"), ("Hub", "R2"),
+    ("Hub", "R3"), ("Hub", "R4"),
+])
+
+path       = nx.shortest_path(G, source="R1", target="R4")
+centrality = nx.betweenness_centrality(G)</pre>
+
+  <h3>Scapy — Packet Analysis <span class="priority-low">Priority: Low</span></h3>
+  <p>Enables low-level network testing — custom ICMP probes, TCP session inspection, DSCP marking verification, and traffic capture.</p>
+<pre>from scapy.all import IP, ICMP, sr1
+
+packet   = IP(dst="192.168.2.1", ttl=64) / ICMP()
+response = sr1(packet, timeout=2, verbose=0)
+
+if response:
+    print(f"Reply from {response.src}  TTL: {response.ttl}")</pre>
+
+  <h3>Nginx — Local HTTPS <span class="priority-med">Priority: Medium</span></h3>
+  <p>Replaces the Cloudflare Tunnel with self-hosted SSL termination. Fully offline, no external dependency, persistent across reboots.</p>
+<pre>server {
+    listen              443 ssl;
+    ssl_certificate     /etc/nginx/ssl/lab.crt;
+    ssl_certificate_key /etc/nginx/ssl/lab.key;
+
+    location / {
+        proxy_pass         http://127.0.0.1:8080;
+        proxy_set_header   Host $host;
+        proxy_set_header   X-Real-IP $remote_addr;
+    }
+}</pre>
+
+  <h2>Implementation Phases</h2>
+  <table>
+    <tr><th>Phase</th><th>Deliverable</th><th>Impact</th></tr>
+    <tr><td>1</td><td>Netmiko replaces raw subshell</td><td>Removes shell injection risk, eliminates fixed sleeps</td></tr>
+    <tr><td>2</td><td>Nornir parallel fleet polling</td><td>10× performance improvement on fleet-wide operations</td></tr>
+    <tr><td>3</td><td>NAPALM structured data layer</td><td>Structured JSON responses for AI and analytics</td></tr>
+    <tr><td>4</td><td>NetworkX topology endpoint</td><td>Live graph API for topology-aware automation</td></tr>
+    <tr><td>5</td><td>Scapy diagnostic module</td><td>Packet-level testing and DSCP verification</td></tr>
+    <tr><td>6</td><td>Nginx SSL termination</td><td>Full local HTTPS, no external dependencies</td></tr>
+  </table>
+
+</div>
+
+<div class="footer">
+  © 2026 Ioannis Alexander Konstas — IT Solutions USA &nbsp;·&nbsp;
+  <a href="https://ikonstas70.github.io">ikonstas70.github.io</a> &nbsp;·&nbsp;
+  <a href="https://github.com/ikonstas70/network-automation-stack">GitHub Repository</a>
+</div>
+
+</body>
+</html>
